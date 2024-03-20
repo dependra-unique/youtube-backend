@@ -1,0 +1,17 @@
+{
+  "name": "youtubebackend",
+  "version": "1.0.0",
+  "description": "This is a youtube backend that is best for me ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "YoutubeBackend",
+    "VideosHandling",
+    "ImageHandling",
+    "DatabaseHandling"
+  ],
+  "author": "Dependra Kumar",
+  "license": "ISC"
+}

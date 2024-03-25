@@ -21,5 +21,23 @@ app.use(express.urlencoded({extended: true, limit: "16kb"}))
 app.use(express.static("public"))
 //cookies ko access karna & cookies ko set karna , user browser mein securely server side se => basically "CRUD" operation on cookies
 app.use(cookieParser())
+
+
+
+
+
+//router import 
+import userRouter from './routes/user.routes.js'
+
+
+
+//routes deceleration
+//standard practice  => "/api/v1/users"
+app.use("/api/v1/users", userRouter);        //jaise hi user "/user" par jayega tabhi user apna saara control "userRouter" ko dedega          //http://localhost:8000/api/v1/users/register
+
+
+
+
+
 export default app;
 

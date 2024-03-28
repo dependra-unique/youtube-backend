@@ -1,16 +1,17 @@
-import { User } from "../models/user.model";
-import ApiError from "../utils/ApiError";
-import asyncHandler from "../utils/asyncHandler";
-import { Jwt } from "jsonwebtoken";
-
+import { User } from "../models/user.model.js";
+import ApiError from "../utils/ApiError.js";
+import asyncHandler from "../utils/asyncHandler.js";
+import jwt from 'jsonwebtoken'
+;
 
 //custom cookie => "request" ke andar "user" add karne ki custom cookie banayi hai ye (ye logout ke lia chahiye islia)
 export const verifyJWT = asyncHandler(async (req, _, next) => {   // if do not use response, then we replace "res" to "_"(underscore)
 
     try {
         //hume phle accessToken chahiye => accessToken user ki request se milega (because user ne request mein cookie send ki hai)
-        const token = req.cookies()?.accessToken || req.header("Authorization")?.replace("bearer ", "")
-    
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("bearer ", "")
+        // console.log(token);
+
         //ydi token nhi ahi to error 
         if(!token){
             throw new ApiError(401, "unauthorized user")

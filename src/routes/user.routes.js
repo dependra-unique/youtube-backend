@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/user.controller.js";
+import { loginUser, logoutUser, registerUser } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router()
@@ -20,6 +20,9 @@ router.route("/register").post(
     registerUser
     )     //router kh raha hai ki "/register" url par jao aur "registerUser" method call kar do
 
-// router.route("/login").post(login)      // yhi par change hoga only aapko "app.js " mein jakar change karne ki jarurat nhi hai
+router.route("/login").post(loginUser)      // yhi par change hoga only aapko "app.js " mein jakar change karne ki jarurat nhi hai
+
+//secured routes
+router.route("/logout").post(verifyJWT, logoutUser)
 
 export  default router;

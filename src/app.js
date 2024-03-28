@@ -20,7 +20,7 @@ app.use(express.urlencoded({extended: true, limit: "16kb"}))
 //server par ydi koi file/photo rakhna hai to "static" configuration use karte hai esse "public assests" bhi khte hai
 app.use(express.static("public"))
 //cookies ko access karna & cookies ko set karna , user browser mein securely server side se => basically "CRUD" operation on cookies
-app.use(cookieParser())
+app.use(cookieParser())      //user ne request kari hai cookies ke lia
 
 
 

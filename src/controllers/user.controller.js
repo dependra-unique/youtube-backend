@@ -3,6 +3,22 @@ import ApiError from "../utils/ApiError.js";
 import {User} from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import ApiResponse from '../utils/ApiResponse.js'
+import { set } from "mongoose";
+
+const generateAccessAndRefreshTokens = async (userId) => {
+   try {
+     const user = await User.findById(userId);
+     const accessToken = user.generateAccessToken()
+     const refreshToken = user.generateRefreshToken()
+ 
+     user.refreshToken = refreshToken;
+     await user.save({validateBeforeSave: false});         //ydi refreshToken save karege database mein to problem hogi beacuse password required hai (islia "validateBeforeSave: false" kar do iska matlab => save hone se phle validate mat karo)
+ 
+     return {accessToken, refreshToken};
+   } catch (error) {
+        throw new ApiError(500, "something went wrong while generating the accessToken & refreshToken")
+   }
+}
  
 
 const registerUser = asyncHandler( async (req, res) => {
@@ -113,4 +129,83 @@ const registerUser = asyncHandler( async (req, res) => {
 
 })
 
-export {registerUser}
+
+const loginUser = asyncHandler( async (req, res) => {
+    //1. get user data => req.body
+    //2. username or email 
+    //3. find the user 
+    //4. password check
+    //5. access and refresh token 
+    //6. send cookie(access & refresh token)
+
+    const {username, email, password} = req.body;
+    if(!email || !username){
+        throw new ApiError(404, "username or email is required")
+    }
+
+    const user = await User.findOne({
+        $or: [{username}, {email}]
+    })
+    if(!user){
+        throw new ApiError(404, "user does not exists");
+    }
+
+    const isPasswordValid = user.isPasswordCorrect(password);
+    if(!isPasswordValid){
+        throw new ApiError(401, "Invalid user credentials");
+    }
+
+
+    const {accessToken, refreshToken} = await generateAccessAndRefreshTokens(user._id);
+
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+        new ApiResponse(
+            200,
+            {
+                user: accessToken, refreshToken, loggedInUser
+            },
+            "User logged in successfully"
+        )
+    )
+})
+
+
+const logoutUser = asyncHandler( async (req, res) => {
+    //user ko database se hata do
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+        {
+            new: true
+        }
+    )
+
+    //cookies ko bhi hata do
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(200, {}, "User logged out ")
+})
+
+export {registerUser, loginUser, logoutUser}

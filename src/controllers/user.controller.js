@@ -348,7 +348,7 @@ const updateUserAvatar = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Error in avatar file while uploading on cloudinary")
     }
 
-
+    //TODO: Delete old Image - Assignment
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -363,7 +363,9 @@ const updateUserAvatar = asyncHandler( async (req, res) => {
 
     return res
     .status(200)
-    .json(200, user, "avatar image file uploaded successfully")
+    .json(
+        new ApiResponse(200, user, "avatar image file uploaded successfully")
+    )
 })
 
 
@@ -379,6 +381,7 @@ const updateUserCoverImage = asyncHandler( async (req, res) => {
         throw new ApiError(400, "Error in uploading cover image on cloudinary")
     }
 
+    //TODO: Delete old Image - Assignment
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {

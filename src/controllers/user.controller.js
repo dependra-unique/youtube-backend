@@ -4,7 +4,7 @@ import {User} from '../models/user.model.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import ApiResponse from '../utils/ApiResponse.js'
 import jwt from 'jsonwebtoken';
-import { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 
 const generateAccessAndRefreshTokens = async (userId) => {
@@ -338,8 +338,8 @@ const updateAccountDetails = asyncHandler( async (req, res) => {
 
 
 const updateUserAvatar = asyncHandler( async (req, res) => {
-    const avatarLocalPath = req.file?.url
-
+    const avatarLocalPath = req.file?.path
+    console.log(req.file);
     if(!avatarLocalPath){
         throw new ApiError(400, "avatar file is missing")
     }
@@ -371,7 +371,7 @@ const updateUserAvatar = asyncHandler( async (req, res) => {
 
 
 const updateUserCoverImage = asyncHandler( async (req, res) => {
-    const coverImageLocalPath = req.file?.url
+    const coverImageLocalPath = req.file?.path
     if(!coverImageLocalPath){
         throw new ApiError(400, "cover image not found")
     }
@@ -478,6 +478,7 @@ const getUserChannelProfile = asyncHandler( async (req, res) => {
 
 const getWatchHistory = asyncHandler( async (req, res) => {
 
+    //aggregate function array return karta hai ,,hume array ki first value ki hi jarurat hai
     const user = await User.aggregate([
         {   //aggregate pipelins ke andar mongoose kamm nhi karta islia database mein se user id string se nikal kar di hai
             $match: {
@@ -502,9 +503,9 @@ const getWatchHistory = asyncHandler( async (req, res) => {
                             pipeline: [
                                 {
                                     $project: {
-                                        fullName,
-                                        username,
-                                        avatar
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
                                     }
                                 }
                             ]
@@ -522,7 +523,7 @@ const getWatchHistory = asyncHandler( async (req, res) => {
             }
         }
     ])
-
+    console.log(user);
     return res
     .status(200)
     .json(

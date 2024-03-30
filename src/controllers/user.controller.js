@@ -278,9 +278,9 @@ const changeCurrentPassword = asyncHandler( async (req, res) => {
     const user = await User.findById(req.user?._id);
     //es user ka oldPassword check kar lo
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
-
+   
     //if oldPassword is incurrect => throw error
-    if(!oldPassword){
+    if(!isPasswordCorrect){
         throw new ApiError(404, "inCurrect password")
     }
 

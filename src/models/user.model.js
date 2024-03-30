@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema(
 //database ke userSchema mein ydi password save kar rhe ho to ,password save karne se phle password ko encrypt karo and then save karo
 userSchema.pre("save", async function (next){
     if(!this.isModified("password")) return next();
-
+   
     this.password = await bcrypt.hash(this.password, 10);
     next();
 })
@@ -65,7 +65,7 @@ userSchema.pre("save", async function (next){
 
 //User model ko ydi hum kisi or file mein import karana chahte hai to us file mein bhi password encryted hona chahiye eslia compare kar lo import karne se phle hi
 userSchema.methods.isPasswordCorrect = async function (password){
-
+    
     return await bcrypt.compare(password, this.password)
 }
 

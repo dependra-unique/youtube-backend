@@ -28,13 +28,13 @@ app.use(cookieParser())      //user ne request kari hai cookies ke lia
 
 //router import 
 import userRouter from './routes/user.routes.js'
-
+import commentRouter from './routes/comment.routes.js'
 
 
 //routes deceleration
 //standard practice  => "/api/v1/users"
 app.use("/api/v1/users", userRouter);        //jaise hi user "/user" par jayega tabhi user apna saara control "userRouter" ko dedega          //http://localhost:8000/api/v1/users/register
-
+app.use("/api/v1/comments", commentRouter);
 
 
 

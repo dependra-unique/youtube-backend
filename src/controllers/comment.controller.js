@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { Video } from "../models/video.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
+import { Like } from "../models/like.model.js";
 
 
 
@@ -63,7 +64,7 @@ const updateComment = asyncHandler( async (req, res) => {
     
     //get comment by comment id,,, database se because jisne comment kia hai usi user ko allow karege comment update karne ke lia
     const {commentId} = req.params;
-    const comment = Comment.findById(commentId)
+    const comment = await Comment.findById(commentId)
 
     //user se content le lo comment update karne ke lia
     const {content} =  req.body
@@ -100,6 +101,29 @@ const updateComment = asyncHandler( async (req, res) => {
 
 const deleteComment = asyncHandler( async (req, res) => {
     //TODO: delete comment 
+    const {commentId} = req.params
+    const comment = await Comment.findById(commentId)
+
+    if(!comment){
+        throw new ApiError(404, "comment not found")
+    }
+
+    if(comment?.owner.toString() !== req.user?._id.toString()){
+        throw new ApiError(400, "Only owner can delete the comment")
+    }
+
+    await Comment.findByIdAndDelete(commentId)
+
+    //comment ke andar jo like hai vo dalete karna hai
+    await Like.deleteMany({
+        comment: commentId,
+        likedBy: req.user
+    })
+
+    return res
+    .status(200)
+    .json(200, {commentId}, "comment successfully deleted")
+
 })
 
 

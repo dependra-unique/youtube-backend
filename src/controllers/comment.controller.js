@@ -17,30 +17,35 @@ const addComment = asyncHandler( async (req, res) => {
     const {content} = req.body
     
     //jis video par comment karna hai us video ko nikalo => video ko nikaalne ke lia user se video id lelo url par click karwake
-    const {videoId} = req.params
-
-    if(!isValidObjectId(videoId)){
-        throw new ApiError(400, "Invalid videoId...")
-    }
-
-    const video = await Video.findById(videoId)
-
-    if(!video){
-        throw new ApiError(501, "Video not found")
-    }
-
-    if(content === ""){
-        throw new ApiError(400, "Content is required")
-    }
-    //create comment
-    const comment = await Comment.create({
-        content,
-        video: video?._id,
-        owner: req.user?._id
-    })
-
-    if(!comment){
-        throw new ApiError(400, "Comment not created...")
+    try {
+        const {videoId} = req.params
+    
+        console.log(videoId);
+        if(!isValidObjectId(videoId)){
+            throw new ApiError(400, "Invalid videoId...")
+        }
+    
+        const video = await Video.findById(videoId)
+    
+        if(!video){
+            throw new ApiError(501, "Video not found")
+        }
+    
+        if(content === ""){
+            throw new ApiError(400, "Content is required")
+        }
+        //create comment
+        const comment = await Comment.create({
+            content,
+            video: video?._id,
+            owner: req.user?._id
+        })
+    
+        if(!comment){
+            throw new ApiError(400, "Comment not created...")
+        }
+    } catch (error) {
+        console.log("Error in adding comment: ", error);
     }
 
     return res
